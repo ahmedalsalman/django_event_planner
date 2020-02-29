@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="masthead text-center text-white">
+  <div class="masthead-content">
+    <div class="container">
+        <div class="my-3 p-3 bg-black rounded shadow-sm">
+        <div class="card-body">
+          <h1 class="card-title">{{event.title}}</h1>
+          <h2 class="card-text">{{event.description}}</h2>
+          <h2 class="card-text">{{event.location}}</h2>
+          <h2 class="card-text">The event will be held on {{event.datetime}}</h2>
+          <h2 class="card-text">Total seats: {{event.seats}}</h2>
+        </div>
+        <button><a href="{% url  'book' event.id %}" class="btn btn-outline-danger btn-block">Book a seat in this event</a></button>
+        {% if request.user == event.owner %}
+          <button><a href="{% url  'edit' event.id %}" class="btn btn-outline-danger btn-block">Edit</a></button>
+          <br/>
+          <h3>People participating in this event:</h3>
+          {% for n in participants %}
+          <div class="col-md-4">
+              <div class="card my-card">
+                <div class="card-body">
+                  <a href="#" ><h5 class="card-title">{{n.participant.first_name}} {{n.participant.last_name}}</h5></a>
+                </div>
+              </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="bg-circle-1 bg-circle"></div>
+    <div class="bg-circle-2 bg-circle"></div>
+    <div class="bg-circle-3 bg-circle"></div>
+    <div class="bg-circle-4 bg-circle"></div>
+        </header>
+{% endblock %}

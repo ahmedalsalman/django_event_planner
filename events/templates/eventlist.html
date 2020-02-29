@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br/>
+<br/>
+<br/>
+<form class="form-inline my-2 my-lg-0" action="{% url 'find-events' %}">
+  <input class="form-control mr-sm-2" type="search" placeholder="Search Items" aria-label="Search" name="q">
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+</form>
+  <header class="masthead text-center text-white">
+    <div class="masthead-content">
+      <div class="container">
+        <div class="my-3 p-3 bg-black rounded shadow-sm">
+            <h1 class="border-bottom border-gray pb-2 mb-5">Upcoming Events</h1>
+            {% for i in all_events %}
+
+                <div class="row mb-12">
+                  <h3 class="media-body pb-3 mb-2  border-bottom border-gray">
+                    <strong class="d-block text-gray-dark"><a href="{% url 'event-detail' i.id %}">{{i.title}}</a></strong>
+                    {{i.datetime}}
+                  </h3>
+                </div>
+
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-circle-1 bg-circle"></div>
+    <div class="bg-circle-2 bg-circle"></div>
+    <div class="bg-circle-3 bg-circle"></div>
+    <div class="bg-circle-4 bg-circle"></div>
+  </header>
+
+
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<header class="masthead text-center text-white">
+  <div class="masthead-content">
+    <div class="container">
+        <div class="my-3 p-3 bg-black rounded shadow-sm">
+        <div class="card-body">
+          <h1 class="card-title">{{event.title}}</h1>
+          <h2 class="card-text">{{event.description}}</h2>
+          <h2 class="card-text">{{event.location}}</h2>
+          <h2 class="card-text">{{event.datetime}}</h2>
+          <h2 class="card-text">{{event.seats}}</h2>
+        </div>
+        {% if request.user == event.owner %}
+          <button><a href="{% url  'edit' event.id %}" class="btn btn-outline-danger btn-block">Edit</a></button>
+        {% endif %}
+        <br>
+
+          <h5 class="card-header" >How many seats would you like to book?</h5>
+
+
+
+                <form action="{% url 'book' event.id %}" method="POST" enctype="multipart/form-data" class="my-3 p-3 bg-black rounded shadow-sm">
+                    {% csrf_token %}
+                    {{form|crispy}}
+                      {% if event.seats_remaining != 0 %}
+                      <input type="submit" value="Book Event" class="btn btn-outline-primary">
+                      {% else %}
+                      <a href="{% url 'find-events' %}" class="btn btn-outline-warning">All Seats Have Been Booked</a>
+                      {% endif %}
+                </form>
+
+
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-circle-1 bg-circle"></div>
+    <div class="bg-circle-2 bg-circle"></div>
+    <div class="bg-circle-3 bg-circle"></div>
+    <div class="bg-circle-4 bg-circle"></div>
+        </header>
+{% endblock %}
