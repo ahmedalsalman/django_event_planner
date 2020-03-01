@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import *
+from .models import Event , Participant
 
 class UserSignup(forms.ModelForm):
     class Meta:
@@ -8,7 +8,7 @@ class UserSignup(forms.ModelForm):
         fields = ['username', 'first_name', 'last_name', 'email' ,'password']
 
         widgets={
-        'password': forms.PasswordInput(),
+            'password': forms.PasswordInput(),
         }
 
 
@@ -22,7 +22,7 @@ class EventForm (forms.ModelForm):
         model = Event
         fields = ['title','description','location','datetime','seats',]
         widgets={
-        'datetime': forms.DateTimeInput(format='%Y-%m-%d %H:%M'),
+            'datetime': forms.DateTimeInput(format='%Y-%m-%d %H:%M'),
         }
 
 class ParticipantForm (forms.ModelForm):

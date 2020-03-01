@@ -1,17 +1,23 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
-from .forms import *
-from .models import *
 from django.contrib import messages
 from django.contrib.auth.models import User
 from datetime import datetime
-import django.contrib.postgres
 from django.db.models import Q
+
+from .forms import (
+	UserSignup,
+	UserLogin,
+	EventForm,
+	ParticipantForm
+	)
+from .models import Event , Participant
 
 def home(request):
 	return render(request, 'home.html')
-#------------------------>CRUD<-------------------------
+
+
 class Signup(View):
 	form_class = UserSignup
 	template_name = 'signup.html'
@@ -64,15 +70,18 @@ class Logout(View):
 		logout(request)
 		messages.success(request, "You have successfully logged out.")
 		return redirect("login")
-#------------------>Auth end<----------------------
+
+
 def event_list(request):
+	# Change variable name of all_events
 	all_events = Event.objects.filter(datetime__gte = datetime.today()) #change it to timezone.now after you know what to import
 	query = request.GET.get('q')
 	if query:
 		all_events = all_events.filter(
 		Q(title__icontains=query)
 		| Q(description__icontains=query)
-		| Q(owner__first_name__icontains=query)).distinct()
+		| Q(owner__first_name__icontains=query)
+		| Q(owner__last_name__icontains=query)).distinct()
 
 	context = {
 	'all_events' : all_events,
@@ -80,26 +89,21 @@ def event_list(request):
 	}
 	return render(request , "eventlist.html" , context )
 
+
 def dashboard(request):
-	owner = User.objects.get(id = request.user.id)
-	owned_events = Event.objects.filter(owner_id=owner)
-
-	participant = User.objects.get(id = request.user.id)  #you might need to change the model for this one
-	events = Participant.objects.filter(participant_id = participant)
-	#userid = user_id
+	owned_events = request.user.events.all()
+	events = request.user.participated.all()
 	context = {
-
-	'events' : events,
-	'participant' : participant,
-	'owned_events' : owned_events,
-	'owner': owner,
+		'events' : events,
+		'owned_events' : owned_events,
 
 	}
 	return render(request , "dashboard.html" , context )
-#--------------->CRUD<-------------------
+
+
 def event_detail(request , event_id):
 	event = Event.objects.get(id = event_id)
-	participants = Participant.objects.filter(event = event)
+	participants = event.participants.all()
 	context ={
 	"event" : event,
 	"participants": participants
@@ -110,7 +114,7 @@ def event_update(request , event_id):
 	event = Event.objects.get(id=event_id)
 	form = EventForm(instance=event)
 	if request.method == "POST":
-		form = EventForm(request.POST, request.FILES or None, instance=event)
+		form = EventForm(request.POST, instance=event)
 		if form.is_valid():
 			form.save()
 			messages.success(request, "Successfully Edited!")
@@ -129,7 +133,6 @@ def event_create(request):
 		if form.is_valid():
 			event = form.save(commit = False)
 			event.owner = request.user
-			event.participant_id = request.user.id
 			event.seats_remaining = event.seats
 			event.save()
 			messages.success(request, "Successfully Added!")
@@ -141,7 +144,6 @@ def event_create(request):
 	return render(request , 'create.html' , context)
 
 def event_book(request, event_id):
-
 	form = ParticipantForm()
 	event = Event.objects.get(id = event_id)
 	if request.method == "POST":
@@ -171,5 +173,3 @@ def event_delete(request , event_id ):
 	Event.object.get(id = event_id).delete()
 	messages.success(request, "Successfully Deleted!")
 	return redirect("event-list")
-
-#--------->Crud End<------------------
